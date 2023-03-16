@@ -8,5 +8,5 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - uses: php-actions/composer@v2
+    - uses: php-actions/composer@v1
     - user: php-actions/phpunit@v9
