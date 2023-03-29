@@ -95,6 +95,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'owner', targetEntity: Message::class)]
     private Collection $messages;
 
+    #[ORM\OneToMany(mappedBy: 'owner', targetEntity: Conversation::class, orphanRemoval: true)]
+    private Collection $ownedConversation;
+
+    #[ORM\OneToMany(mappedBy: 'guest', targetEntity: Conversation::class, orphanRemoval: true)]
+    private Collection $guestConversation;
+
+    #[ORM\OneToMany(mappedBy: 'owner', targetEntity: PrivateMessage::class, orphanRemoval: true)]
+    private Collection $ownedPrivateMessage;
+
     public function __construct()
     {
         $this->ownedGroups = new ArrayCollection();
@@ -102,6 +111,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->groupRequests = new ArrayCollection();
         $this->threads = new ArrayCollection();
         $this->messages = new ArrayCollection();
+        $this->ownedConversation = new ArrayCollection();
+        $this->guestConversation = new ArrayCollection();
+        $this->ownedPrivateMessage = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -338,6 +350,96 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($message->getOwner() === $this) {
                 $message->setOwner(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Conversation>
+     */
+    public function getOwnedConversation(): Collection
+    {
+        return $this->ownedConversation;
+    }
+
+    public function addOwnedConversation(Conversation $ownedConversation): self
+    {
+        if (!$this->ownedConversation->contains($ownedConversation)) {
+            $this->ownedConversation->add($ownedConversation);
+            $ownedConversation->setOwner($this);
+        }
+
+        return $this;
+    }
+
+    public function removeOwnedConversation(Conversation $ownedConversation): self
+    {
+        if ($this->ownedConversation->removeElement($ownedConversation)) {
+            // set the owning side to null (unless already changed)
+            if ($ownedConversation->getOwner() === $this) {
+                $ownedConversation->setOwner(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Conversation>
+     */
+    public function getGuestConversation(): Collection
+    {
+        return $this->guestConversation;
+    }
+
+    public function addGuestConversation(Conversation $guestConversation): self
+    {
+        if (!$this->guestConversation->contains($guestConversation)) {
+            $this->guestConversation->add($guestConversation);
+            $guestConversation->setGuest($this);
+        }
+
+        return $this;
+    }
+
+    public function removeGuestConversation(Conversation $guestConversation): self
+    {
+        if ($this->guestConversation->removeElement($guestConversation)) {
+            // set the owning side to null (unless already changed)
+            if ($guestConversation->getGuest() === $this) {
+                $guestConversation->setGuest(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, PrivateMessage>
+     */
+    public function getOwnedPrivateMessage(): Collection
+    {
+        return $this->ownedPrivateMessage;
+    }
+
+    public function addOwnedPrivateMessage(PrivateMessage $ownedPrivateMessage): self
+    {
+        if (!$this->ownedPrivateMessage->contains($ownedPrivateMessage)) {
+            $this->ownedPrivateMessage->add($ownedPrivateMessage);
+            $ownedPrivateMessage->setOwner($this);
+        }
+
+        return $this;
+    }
+
+    public function removeOwnedPrivateMessage(PrivateMessage $ownedPrivateMessage): self
+    {
+        if ($this->ownedPrivateMessage->removeElement($ownedPrivateMessage)) {
+            // set the owning side to null (unless already changed)
+            if ($ownedPrivateMessage->getOwner() === $this) {
+                $ownedPrivateMessage->setOwner(null);
             }
         }
 
